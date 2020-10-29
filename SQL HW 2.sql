@@ -22,16 +22,29 @@ SELECT CompanyName, ContactName, Phone, City, Fax FROM Suppliers WHERE Fax IS NU
 SELECT * FROM Customers WHERE City = 'Paris';
 
 -- 7.
-SELECT DISTINCT TOP 5 Customers.CustomerID, Customers.CompanyName, [Order Details].Quantity
+SELECT TOP 5 Customers.CustomerID, Customers.CompanyName, 
+SUM([Order Details].Quantity) AS 'Total quantity'
 FROM Customers 
 INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
 INNER JOIN [Order Details] ON Orders.OrderID = [Order Details].OrderID
-WHERE Customers.City = 'Paris'
-ORDER BY Quantity DESC;
+WHERE Customers.Country = 'France'
+GROUP BY Customers.CustomerID, Customers.CompanyName
+ORDER BY SUM([Order Details].Quantity) DESC;
 
 -- 8.
 SELECT Customers.CompanyName, Customers.ContactName, Customers.ContactTitle, 
-Customers.Address, Customers.PostalCode, Customers.Phone, Customers.Fax
+Customers.Phone, Customers.Fax,
+SUM(
+CASE
+    WHEN DATEDIFF(DD, Orders.ShippedDate, Orders.RequiredDate) > 10
+        THEN 1
+    ELSE 0
+END) AS 'Number of overdue orders'
 FROM Customers
 INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
-WHERE DATEDIFF(D, Orders.RequiredDate, Orders.OrderDate) > 10 AND Customers.City = 'Paris';
+WHERE DATEDIFF(DD, Orders.ShippedDate, Orders.RequiredDate) > 10 AND Customers.Country = 'France'
+GROUP BY Customers.CompanyName, Customers.ContactName, Customers.ContactTitle, 
+Customers.Phone, Customers.Fax;
+
+SELECT OrderDate, ShippedDate, RequiredDate
+FROM Orders;
