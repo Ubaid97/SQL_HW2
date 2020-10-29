@@ -20,3 +20,18 @@ SELECT CompanyName, ContactName, Phone, City, Fax FROM Suppliers WHERE Fax IS NU
 
 -- 6. Information on customers from Paris
 SELECT * FROM Customers WHERE City = 'Paris';
+
+-- 7.
+SELECT DISTINCT TOP 5 Customers.CustomerID, Customers.CompanyName, [Order Details].Quantity
+FROM Customers 
+INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+INNER JOIN [Order Details] ON Orders.OrderID = [Order Details].OrderID
+WHERE Customers.City = 'Paris'
+ORDER BY Quantity DESC;
+
+-- 8.
+SELECT Customers.CompanyName, Customers.ContactName, Customers.ContactTitle, 
+Customers.Address, Customers.PostalCode, Customers.Phone, Customers.Fax
+FROM Customers
+INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+WHERE DATEDIFF(D, Orders.RequiredDate, Orders.OrderDate) > 10 AND Customers.City = 'Paris';
